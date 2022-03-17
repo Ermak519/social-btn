@@ -4,24 +4,29 @@ import axios from "axios";
 
 const MailBtn = () => {
       const handleRedirect = () => {
-        window.location.href = `https://oauth.vk.com/authorize?client_id=8103808&display=popup&redirect_uri=http://localhost:3000&scope=email&response_type=code&v=5.120`;
+        window.location.href = `https://oauth.mail.ru/login?client_id=${process.env.REACT_APP_MAIL_ID}&response_type=code&scope=userinfo&redirect_uri=${process.env.REACT_APP_LOCAL_URL}&state=mail`;
       };
 
     // отправка кода на сервер и получение данных о пользователе      
-      const sendCode = async(code) => {
-        const host = 'http://localhost:3000'
+      const getToken = async(code) => {
+        const host = 'https://oauth.mail.ru/token'
         const {data} = await axios.post(`${host}`, {data: {
-            code
+          grant_type: 'authorization_code',
+          code,
+          redirect_uri: process.env.REACT_APP_LOCAL_URL
         }});
         return data
       }
 
       useEffect(()=>{
-          const vkCode = queryString.parse(window.location.search).code
-          if(vkCode) {
-            const user = sendCode(vkCode)
-            localStorage.setItem('userVk', JSON.stringify(user))
-          }
+          const mailCode = queryString.parse(window.location.search).code
+          console.log(mailCode)
+          // if(mailCode) {
+          //   getToken(mailCode).then((token)=>{
+          //     console.log(token)
+          //   })
+          //   // localStorage.setItem('user', JSON.stringify({type: 'mail', user}))
+          // }
       }, [])
 
   return (
